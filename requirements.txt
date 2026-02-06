@@ -1,6 +1,6 @@
 # ---- Cloud / Dashboard ----
-streamlit==1.19.0
-altair==4.2.2
+streamlit>=1.31.0
+altair>=4.2.2,<5.0.0
 
 # ---- Backend ----
 fastapi
@@ -8,3 +8,4 @@ uvicorn
 python-multipart
 requests
 pandas
+sqlalchemy
