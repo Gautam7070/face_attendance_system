@@ -20,15 +20,16 @@ if "%choice%"=="1" (
 
 if "%choice%"=="2" (
     echo.
-    echo Starting API server...
-    .\env\Scripts\python.exe -m uvicorn api.main:app --reload
+    echo Starting SQLAlchemy API server...
+    cd backend
+    ..\env\Scripts\python.exe -m uvicorn main:app --reload
     goto end
 )
 
 if "%choice%"=="3" (
     echo.
-    echo Starting Web Dashboard...
-    .\env\Scripts\python.exe -m streamlit run dashboard/dashboard.py
+    echo Starting Admin Dashboard...
+    .\env\Scripts\python.exe -m streamlit run dashboard/admin_dashboard.py
     goto end
 )
 

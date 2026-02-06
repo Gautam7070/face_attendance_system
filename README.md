@@ -53,13 +53,13 @@ Run `python gui/app.py` or `run_gui.bat`.
 - **Auto-Cooldown**: Prevents duplicate entries within 1 hour.
 
 ### 2. Admin API (Backend)
-Run `uvicorn api.main:app --reload`.
+Run `cd backend && uvicorn main:app --reload`.
 - Fully documented at `http://127.0.0.1:8000/docs`.
-- Manage identities and logs via secure REST endpoints.
+- Uses SQLAlchemy and SQLite for robust data management.
 
 ### 3. Web Dashboard (Analytics)
-Run `streamlit run dashboard/dashboard.py`.
-- Interactive attendance trends.
+Run `streamlit run dashboard/admin_dashboard.py`.
+- Interactive attendance stats fetched directly from the API.
 - Modern glassmorphism UI.
 
 ---
