@@ -1,12 +1,8 @@
-face-recognition
-opencv-python
-numpy
-pandas
-scipy
-mediapipe
+# ---------- CLOUD ONLY ----------
 fastapi
 uvicorn
 python-multipart
-streamlit
+pandas
 requests
+streamlit
 streamlit-lottie
