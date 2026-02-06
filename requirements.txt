@@ -1,4 +1,3 @@
-# ---------- CLOUD ONLY ----------
 fastapi
 uvicorn
 python-multipart
