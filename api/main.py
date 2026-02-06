@@ -1,13 +1,17 @@
 import sys
 import os
+from datetime import datetime
+
 # Add parent directory to path to allow importing from 'security' and 'api'
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import FastAPI, UploadFile, File
 import numpy as np
 import cv2
 import face_recognition
-from datetime import datetime
+
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+
 from security.liveness import LivenessDetector
 from alerts.whatsapp import send_whatsapp_alert
 from api.database import (
@@ -17,7 +21,18 @@ from api.database import (
     mark_attendance
 )
 
+# ================= APP INIT =================
+
 app = FastAPI(title="Face Attendance Admin API")
+
+# ================= CORS CONFIG =================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],     # allow all origins (frontend, admin panel, etc.)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Persistent Liveness Detector for API Replay/Motion Check
 api_liveness = LivenessDetector()
@@ -62,7 +77,7 @@ def attendance_percentage():
     total = len(set(data["names"]))
 
     if total == 0:
-        return {"percentage": 0}
+        return {"attendance_percentage": 0}
 
     df = read_attendance()
     today = datetime.now().strftime("%Y-%m-%d")
@@ -71,11 +86,11 @@ def attendance_percentage():
     percentage = round((present / total) * 100, 2)
     return {"attendance_percentage": percentage}
 
-# ================= FACE UPLOAD =================
+# ================= FACE REGISTRATION =================
 
 @app.post("/register-face")
 async def register_face(file: UploadFile = File(...), name: str = ""):
-    if name == "":
+    if not name:
         return {"error": "Name is required"}
 
     image_bytes = await file.read()
@@ -83,14 +98,14 @@ async def register_face(file: UploadFile = File(...), name: str = ""):
     image = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    
+
     # Resize for faster processing
     small_rgb = cv2.resize(rgb, (0, 0), fx=0.25, fy=0.25)
-    
+
     locations = face_recognition.face_locations(small_rgb)
     encodings = face_recognition.face_encodings(small_rgb, locations)
 
-    if len(encodings) == 0:
+    if not encodings:
         return {"error": "No face detected"}
 
     data = load_encodings()
@@ -101,6 +116,8 @@ async def register_face(file: UploadFile = File(...), name: str = ""):
 
     return {"message": f"Face registered for {name}"}
 
+# ================= MARK ATTENDANCE =================
+
 @app.post("/mark-attendance")
 async def api_mark_attendance(file: UploadFile = File(...)):
     image_bytes = await file.read()
@@ -108,10 +125,10 @@ async def api_mark_attendance(file: UploadFile = File(...)):
     image = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    
+
     # Resize for faster processing
     small_rgb = cv2.resize(rgb, (0, 0), fx=0.25, fy=0.25)
-    
+
     locations = face_recognition.face_locations(small_rgb)
     encodings = face_recognition.face_encodings(small_rgb, locations)
 
@@ -121,22 +138,19 @@ async def api_mark_attendance(file: UploadFile = File(...)):
 
     if not api_liveness.detect_replay(image):
         return {"error": "Replay attack detected: reused image"}
-    # ---------------------------------------------
+    # ----------------------------------------------
 
-    if len(encodings) == 0:
+    if not encodings:
         return {"error": "No face detected"}
 
     data = load_encodings()
     known_encs = data.get("encodings", [])
     known_names = data.get("names", [])
 
-    if len(known_encs) == 0:
+    if not known_encs:
         return {"error": "No faces registered in the system"}
 
     distances = face_recognition.face_distance(known_encs, encodings[0])
-    if len(distances) == 0:
-        return {"error": "Recognition failed due to empty database"}
-
     min_dist = np.min(distances)
 
     if min_dist > 0.5:
