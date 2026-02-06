@@ -10,4 +10,3 @@ python-multipart
 streamlit
 requests
 streamlit-lottie
-sqlite3
