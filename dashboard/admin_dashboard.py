@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 
-API_BASE = "http://127.0.0.1:8000"
+API_BASE = "https://face-attendance-system-1-635m.onrender.com"
 
 st.set_page_config(page_title="Attendance Dashboard", page_icon="📊", layout="wide")
 
