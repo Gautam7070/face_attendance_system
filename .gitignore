@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+env/
+venv/
+.env
+
+# Data & Database
+data/encodings.pkl
+attendance/attendance.csv
+*.db
+*.sqlite3
+
+# IDEs
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Alerts
+alerts/whatsapp.py

@@ -1,0 +1,12 @@
+face-recognition
+opencv-python
+numpy
+pandas
+scipy
+mediapipe
+fastapi
+uvicorn
+python-multipart
+streamlit
+requests
+streamlit-lottie
